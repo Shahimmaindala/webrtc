@@ -34,9 +34,14 @@ export async function POST(request: Request) {
 
     // Update session in DB
     const updateField = type === 'snapshot' ? { snapshots: fileUrl } : { recordings: fileUrl };
-    await Session.findByIdAndUpdate(sessionId, {
-      $push: updateField,
-    });
+   await Session.findByIdAndUpdate(
+  sessionId,
+  {
+    $push: updateField,
+    $setOnInsert: { _id: sessionId, createdAt: new Date() }
+  },
+  { upsert: true }
+);
 
     return NextResponse.json({ success: true, url: fileUrl });
   } catch (error) {
