@@ -2,8 +2,7 @@
 import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/db';
 import Session from '@/models/Session';
-import fs from 'fs';
-import path from 'path';
+import { v2 as cloudinary } from 'cloudinary';
 
 export async function POST(request: Request) {
   try {
@@ -21,21 +20,27 @@ export async function POST(request: Request) {
 
     const buffer = Buffer.from(await file.arrayBuffer());
     const filename = `${Date.now()}-${file.name || (type === 'snapshot' ? 'snap.png' : 'rec.webm')}`;
-    const uploadDir = path.join(process.cwd(), 'public', 'uploads', type === 'snapshot' ? 'snapshots' : 'recordings');
+   
+  
 
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
-    }
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
-    const filePath = path.join(uploadDir, filename);
-    fs.writeFileSync(filePath, buffer);
+const base64 = `data:${file.type};base64,${buffer.toString('base64')}`;
 
-    const fileUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/uploads/${type === 'snapshot' ? 'snapshots' : 'recordings'}/${filename}`;
+const uploadResult = await cloudinary.uploader.upload(base64, {
+  folder: type === 'snapshot' ? 'snapshots' : 'recordings',
+});
+
+const fileUrl = uploadResult.secure_url;
 
     // Update session in DB
     const updateField = type === 'snapshot' ? { snapshots: fileUrl } : { recordings: fileUrl };
-   await Session.findByIdAndUpdate(
-  sessionId,
+   await Session.findOneAndUpdate(
+  { _id: sessionId },
   {
     $push: updateField,
     $setOnInsert: { _id: sessionId, createdAt: new Date() }
