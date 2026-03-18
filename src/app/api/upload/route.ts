@@ -30,7 +30,7 @@ export async function POST(request: Request) {
     const filePath = path.join(uploadDir, filename);
     fs.writeFileSync(filePath, buffer);
 
-    const fileUrl = `/uploads/${type === 'snapshot' ? 'snapshots' : 'recordings'}/${filename}`;
+    const fileUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/uploads/${type === 'snapshot' ? 'snapshots' : 'recordings'}/${filename}`;
 
     // Update session in DB
     const updateField = type === 'snapshot' ? { snapshots: fileUrl } : { recordings: fileUrl };
