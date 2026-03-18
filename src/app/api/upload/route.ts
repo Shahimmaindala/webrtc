@@ -39,13 +39,11 @@ const fileUrl = uploadResult.secure_url;
 
     // Update session in DB
     const updateField = type === 'snapshot' ? { snapshots: fileUrl } : { recordings: fileUrl };
-   await Session.findOneAndUpdate(
-  { _id: sessionId },
+   await Session.findByIdAndUpdate(
+  sessionId,
   {
     $push: updateField,
-    $setOnInsert: { _id: sessionId, createdAt: new Date() }
   },
-  { upsert: true }
 );
 
     return NextResponse.json({ success: true, url: fileUrl });
