@@ -6,7 +6,7 @@
     "dev": "next dev",
     "dev:signaling": "node signaling-server.js",
     "build": "next build",
-    "start": "next start",
+   "start": "next start -p $PORT",
     "lint": "eslint"
   },
   "dependencies": {
