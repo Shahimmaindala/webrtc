@@ -5,6 +5,7 @@ import Session from '@/models/Session';
 import { v2 as cloudinary } from 'cloudinary';
 
 export async function POST(request: Request) {
+  console.log("🔥 CLOUDINARY VERSION ACTIVE");
   try {
     await dbConnect();
     const formData = await request.formData();
