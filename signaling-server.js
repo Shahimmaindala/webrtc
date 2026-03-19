@@ -10,10 +10,9 @@ const allowedOrigins = process.env.ALLOWED_ORIGINS
 
 const io = new Server(httpServer, {
   cors: {
-    origin: allowedOrigins,
-    methods: ["GET", "POST"],
-    credentials: true
-  }
+    origin: "*",
+    methods: ["GET", "POST"]
+  },
 });
 
 io.on("connection", (socket) => {
@@ -48,7 +47,7 @@ io.on("connection", (socket) => {
   });
 });
 
-const PORT = process.env.SIGNALING_PORT || 3001;
+const PORT = process.env.PORT || 3001;
 httpServer.listen(PORT, '0.0.0.0', () => {
   console.log(`> Signaling server ready on http://0.0.0.0:${PORT}`);
 });
